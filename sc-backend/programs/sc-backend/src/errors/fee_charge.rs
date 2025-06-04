@@ -10,4 +10,10 @@ pub enum FeeChargeError {
 
     #[msg("Due date must be in the future.")]
     DueDateMustBeInFuture,
+
+    #[msg("The fee charge is already paid.")]
+    FeeAlreadyPaid,
+    
+    #[msg("The fee charge is overdue.")]
+    FeeOverdue,
 }

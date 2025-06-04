@@ -12,7 +12,7 @@ pub struct InitializeRenter<'info> {
         payer = authority, 
         space = 8 + RenterAccount::INIT_SPACE
     )]
-    pub renter_account: Account<'info, RenterAccount>,
+    pub renter_account: Box<Account<'info, RenterAccount>>,
 
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -21,6 +21,5 @@ pub struct InitializeRenter<'info> {
     /// CHECK: who is the owner of the renter account
     pub owner: AccountInfo<'info>,
    
-
     pub system_program: Program<'info, System>,
 }

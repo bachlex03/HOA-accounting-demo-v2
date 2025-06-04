@@ -8,8 +8,10 @@ pub struct RenterAccount {
     pub owner: Pubkey,
     #[max_len(50)]
     pub renter_name: String,
-    pub fee_to_charge_amount: u64, // Amount to charge for fees
-    pub fee_uncharged_count: u64, // Count of fees that have not been charged yet
+    pub bump: u8,
+    pub next_fee_id: u64,
+    pub created_at: i64,
+    pub updated_at: i64,
 }
 
 #[account]
@@ -17,26 +19,15 @@ pub struct RenterAccount {
 pub struct FeeChargeAccount {
     pub from_admin: Pubkey,
     pub to_renter: Pubkey,
+    pub fee_id: u64,
     pub amount: u64,
-    pub due_date: i64,
     pub fee_type: EFeeType,
     pub status: EFeeStatus,
+    pub due_date: i64,
+    pub bump: u8,
+    pub created_at: i64,
+    pub updated_at: i64,
 }
-
-// #[derive(AnchorSerialize, AnchorDeserialize, InitSpace, Clone, Default)]
-// pub enum FeeStatus {
-//     #[default]
-//     Unpaid,
-//     Paid,
-//     Overdue,
-// }
-
-// #[derive(AnchorSerialize, AnchorDeserialize, InitSpace, Clone)]
-// pub enum FeeType {
-//     Monthly,
-//     OneTime,
-//     Special,
-// }
 
 // In Rust, particularly in the context of your Anchor (Solana) code, the `Clone` trait is used to allow a type to be duplicated by creating a deep copy of its value. This is essential for types that need to be copied explicitly, as Rust’s default behavior for most types is to move ownership rather than copy when passing values around. Let’s break down why the `Clone` trait is used in your example and its significance.
 
