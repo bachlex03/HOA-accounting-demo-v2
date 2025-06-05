@@ -1,6 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { ScBackend } from "../target/types/sc_backend";
+import * as bs58 from "bs58";
 import assert from "assert";
 
 describe("sc-backend", () => {
@@ -8,6 +9,7 @@ describe("sc-backend", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
   const program = anchor.workspace.scBackend as Program<ScBackend>;
+  const connection = anchor.getProvider().connection;
 
   const owner = anchor.AnchorProvider.local().wallet;
   const ownerPubkey = owner.publicKey;
@@ -236,5 +238,112 @@ describe("sc-backend", () => {
       feeChargeAccountPDA
     );
     console.log("[LOG:VAR]::feeChargeAccount: ", feeChargeAccount);
+  });
+
+  it("Fetch all unpaid fees", async () => {
+    const unpaidFees = await program.account.feeChargeAccount.all([
+      {
+        memcmp: {
+          offset: 8 + 32 + 32 + 8 + 8 + 1, // Offset to status field (discriminator + from_admin + to_renter + fee_id + amount + fee_type)
+          bytes: "1", // Filter for unpaid fees (status = 1)
+        },
+      },
+    ]);
+
+    console.log("[LOG:VAR]::unpaidFees: ", unpaidFees);
+  });
+
+  it("Fetch all paid fees", async () => {
+    const paidStatus = Buffer.from([1]); // Byte for Paid (0x00)
+    const base58Encoded = bs58.default.encode(paidStatus); // Outputs "2"
+    const dataSize = program.account.feeChargeAccount.size;
+
+    const paidFees = await program.account.feeChargeAccount.all([
+      {
+        memcmp: {
+          offset: 89, // Offset to status field (discriminator + from_admin + to_renter + fee_id + amount + fee_type)
+          bytes: base58Encoded, // Filter for paid fees (status = 0x01, base58-encoded as "2")
+        },
+      },
+      {
+        dataSize: dataSize, // Size of FeeChargeAccount (including discriminator)
+      },
+    ]);
+
+    console.log("[LOG:VAR]::paidFees: ", paidFees);
+  });
+
+  it("pagination for paid fees", async () => {
+    const pageSize = 10; // Number of accounts per page
+    let after: string | undefined = undefined; // Start from the beginning
+    let hasMore = true;
+    let page = 1;
+
+    const paidStatus = Buffer.from([1]); // Byte for Paid (0x00)
+    const base58Encoded = bs58.default.encode(paidStatus); // Outputs "2"
+    const dataSize = program.account.feeChargeAccount.size;
+
+    while (hasMore) {
+      console.log(`[LOG:VAR]::Fetching page ${page}`);
+
+      const filters = [
+        {
+          memcmp: {
+            offset: 89,
+            bytes: base58Encoded,
+          },
+        },
+        {
+          dataSize: dataSize,
+        },
+      ];
+
+      const accounts = await connection.getProgramAccounts(program.programId, {
+        filters: filters,
+        commitment: "confirmed",
+        encoding: "base64",
+        dataSlice: { offset: 0, length: 115 }, // Fetch full account data
+        // Pagination
+        ...(after ? { after } : {}),
+      });
+
+      // Decode accounts into FeeChargeAccount
+      const decodedAccounts = accounts.map(({ pubkey, account }) => {
+        const data = account.data;
+        const feeChargeAccount = program.coder.accounts.decode(
+          "feeChargeAccount",
+          data
+        );
+        return { publicKey: pubkey, account: feeChargeAccount };
+      });
+
+      // Log results for this page
+      console.log(`[LOG:VAR]::Page ${page} paidFees:`, decodedAccounts);
+      decodedAccounts.forEach((fee) => {
+        console.log({
+          publicKey: fee.publicKey.toBase58(),
+          feeId: fee.account.feeId.toNumber(),
+          amount: fee.account.amount.toNumber(),
+          feeType: fee.account.feeType,
+          status: fee.account.status,
+          dueDate: fee.account.dueDate.toNumber(),
+        });
+      });
+
+      // Update pagination
+      hasMore = accounts.length === pageSize; // Continue if we got a full page
+      after =
+        accounts.length > 0
+          ? accounts[accounts.length - 1].pubkey.toBase58()
+          : undefined;
+      page++;
+
+      // Stop if no more accounts or less than pageSize (end of results)
+      if (accounts.length < pageSize) {
+        hasMore = false;
+      }
+    }
+
+    console.log("[LOG]::Pagination complete");
   });
 });

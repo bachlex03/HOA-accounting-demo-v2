@@ -1,20 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { type FC } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+
 import './index.css'
-import { Button } from '@/components/ui/button'
-import Btn from '@/components/Btn'
+import { publicRoutes, privateRoutes } from './routes'
+import AdminLayout from './components/Layouts/AdminLayout'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const routes = [...publicRoutes, ...privateRoutes]
 
   return (
-    <>
-      <div className='text-test-100'>test</div>
-      <Button className='text-xl'>test</Button>
-      <Btn />
-    </>
+    <Router>
+      <div className='app'>
+        <Routes>
+          {routes.map((route, index) => {
+            const Page = route.component
+
+            let Layout: FC<any> = AdminLayout
+
+            if (route.layout) {
+              Layout = route.layout
+            }
+
+            return (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  <Layout>
+                    <Page />
+                  </Layout>
+                }
+              />
+            )
+          })}
+        </Routes>
+      </div>
+    </Router>
   )
 }
 
