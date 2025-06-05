@@ -1,7 +1,7 @@
 const RootPage = () => {
   return (
     <div>
-      <h1>App 123</h1>
+      <h1>Root Page</h1>
     </div>
   )
 }
