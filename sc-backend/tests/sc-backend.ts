@@ -346,4 +346,46 @@ describe("sc-backend", () => {
 
     console.log("[LOG]::Pagination complete");
   });
+
+  it("Fetch all fees belong to creator", async () => {
+    // Fetch all fee charge accounts that belong to the creator (admin)
+    const creatorFees = await program.account.feeChargeAccount.all([
+      {
+        memcmp: {
+          offset: 8, // Skip discriminator (8 bytes) to get to from_admin field
+          bytes: ownerPubkey.toBase58(), // Filter by creator's public key
+        },
+      },
+    ]);
+
+    console.log("[LOG:VAR]::creatorFees: ", creatorFees);
+    console.log("[LOG:VAR]::creatorFees.length: ", creatorFees.length);
+
+    // Log detailed information about each fee
+    creatorFees.forEach((fee, index) => {
+      console.log(`[LOG:VAR]::Fee ${index + 1}:`, {
+        publicKey: fee.publicKey.toBase58(),
+        fromAdmin: fee.account.fromAdmin.toBase58(),
+        toRenter: fee.account.toRenter.toBase58(),
+        feeId: fee.account.feeId.toNumber(),
+        amount: fee.account.amount.toNumber(),
+        feeType: fee.account.feeType,
+        status: fee.account.status,
+        dueDate: fee.account.dueDate.toNumber(),
+        createdAt: fee.account.createdAt.toNumber(),
+        updatedAt: fee.account.updatedAt.toNumber(),
+      });
+    });
+
+    // Assert that we found at least one fee created by this admin
+    assert.ok(creatorFees.length > 0, "Creator should have at least one fee");
+
+    // Verify that all fees belong to the correct creator
+    creatorFees.forEach((fee) => {
+      assert.ok(
+        fee.account.fromAdmin.equals(ownerPubkey),
+        "All fees should belong to the creator"
+      );
+    });
+  });
 });

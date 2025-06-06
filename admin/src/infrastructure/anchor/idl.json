@@ -1,0 +1,358 @@
+{
+  "address": "ECYWXBoSFr6GKZDxFPT7AuV87iVChHA1fXRsNK7xWdwj",
+  "metadata": {
+    "name": "sc_backend",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "add_fee_charge",
+      "discriminator": [89, 113, 20, 169, 159, 22, 224, 243],
+      "accounts": [
+        {
+          "name": "fee_charge_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [70, 69, 69, 95, 67, 72, 65, 82, 71, 69, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "from_authority"
+              },
+              {
+                "kind": "account",
+                "path": "to_renter_account"
+              },
+              {
+                "kind": "account",
+                "path": "to_renter_account.next_fee_id",
+                "account": "RenterAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "to_renter_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [82, 69, 78, 84, 69, 82, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "to_renter_account.owner",
+                "account": "RenterAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "from_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "fee_type",
+          "type": "string"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "due_date",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_renter",
+      "discriminator": [40, 208, 200, 82, 163, 135, 25, 158],
+      "accounts": [
+        {
+          "name": "renter_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [82, 69, 78, 84, 69, 82, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "owner",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "renter_name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "make_payment",
+      "discriminator": [19, 128, 153, 121, 221, 192, 91, 53],
+      "accounts": [
+        {
+          "name": "renter_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [82, 69, 78, 84, 69, 82, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_charge_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [70, 69, 69, 95, 67, 72, 65, 82, 71, 69, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "fee_charge_account.from_admin",
+                "account": "FeeChargeAccount"
+              },
+              {
+                "kind": "account",
+                "path": "renter_account"
+              },
+              {
+                "kind": "arg",
+                "path": "fee_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "_fee_id",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "FeeChargeAccount",
+      "discriminator": [207, 103, 122, 41, 254, 167, 96, 201]
+    },
+    {
+      "name": "RenterAccount",
+      "discriminator": [185, 207, 225, 193, 242, 12, 125, 45]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidFeeType",
+      "msg": "Invalid fee type provided."
+    },
+    {
+      "code": 6001,
+      "name": "AmountMustBeGreaterThanZero",
+      "msg": "The amount must be greater than zero."
+    },
+    {
+      "code": 6002,
+      "name": "DueDateMustBeInFuture",
+      "msg": "Due date must be in the future."
+    },
+    {
+      "code": 6003,
+      "name": "FeeAlreadyPaid",
+      "msg": "The fee charge is already paid."
+    },
+    {
+      "code": 6004,
+      "name": "FeeOverdue",
+      "msg": "The fee charge is overdue."
+    }
+  ],
+  "types": [
+    {
+      "name": "EFeeStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unpaid"
+          },
+          {
+            "name": "Paid"
+          },
+          {
+            "name": "Overdue"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EFeeType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Monthly"
+          },
+          {
+            "name": "OneTime"
+          },
+          {
+            "name": "Special"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeChargeAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "from_admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "to_renter",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_id",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "fee_type",
+            "type": {
+              "defined": {
+                "name": "EFeeType"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "EFeeStatus"
+              }
+            }
+          },
+          {
+            "name": "due_date",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RenterAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "renter_name",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "next_fee_id",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "FEE_CHARGE_TAG",
+      "type": "bytes",
+      "value": "[70, 69, 69, 95, 67, 72, 65, 82, 71, 69, 95, 83, 84, 65, 84, 69]"
+    },
+    {
+      "name": "RENTER_TAG",
+      "type": "bytes",
+      "value": "[82, 69, 78, 84, 69, 82, 95, 83, 84, 65, 84, 69]"
+    }
+  ]
+}

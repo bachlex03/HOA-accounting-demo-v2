@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import useAccounting from '@/hooks/use-accounting'
 
 const statusConfig = {
   PAID: {
@@ -27,6 +28,10 @@ const statusConfig = {
 }
 
 const AccountingPage = () => {
+  const { feeCharges } = useAccounting()
+
+  console.log('[AccountingPage] feeCharges:', feeCharges)
+
   return (
     <div>
       <div className='grid grid-cols-4 gap-10'>
