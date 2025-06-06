@@ -4,10 +4,10 @@ import AccountingPage from './pages/(privates)/Admin/Dashboard/Accounting'
 import RootPage from './pages'
 import PublicLayout from './components/layouts/PublicLayout'
 import ClientLayoutWithAuth from './components/layouts/ClientLayout'
-import AdminLayoutWithAuth from './components/layouts/AdminLayout'
 import AccountingManagementPage from './pages/(privates)/Client/AccountingManagement'
 import LoginPage from './pages/(auth)/Login'
 import AuthLayout from './components/layouts/AuthLayout'
+import DashboardLayoutWithAuth from './components/layouts/DashboardLayout'
 
 type Route = {
   path: string
@@ -31,7 +31,7 @@ const privateRoutes: Route[] = [
   {
     path: '/dashboard/accounting',
     component: AccountingPage,
-    layout: AdminLayoutWithAuth
+    layout: DashboardLayoutWithAuth
   },
   {
     path: 'client/accounting-management',
