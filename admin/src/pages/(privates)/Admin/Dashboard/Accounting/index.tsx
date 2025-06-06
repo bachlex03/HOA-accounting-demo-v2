@@ -11,7 +11,6 @@ import { HiOutlineHome } from 'react-icons/hi2'
 import { CiFilter, CiSearch } from 'react-icons/ci'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 
@@ -43,7 +42,7 @@ const AccountingPage = () => {
           <CiCreditCardOff className='text-[80px]' />
           <p className='text-3xl font-bold font-mono'>$864</p>
           <div className='flex flex-col items-center gap-2'>
-            <p className='text-xl font-semibold'>Current Balance</p>
+            <p className='text-xl font-semibold'>Overdue Payments</p>
             <p className='text-xs text-[#471EA7]'>5 Payments</p>
           </div>
         </div>

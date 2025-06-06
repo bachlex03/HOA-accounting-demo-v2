@@ -1,14 +1,11 @@
+import WithAuthHoc from '@/components/HoCs/WithAuthHoc'
 import type { FC } from 'react'
 
 const AuthLayout: FC<{
   children?: React.ReactNode
 }> = ({ children }) => {
-  return (
-    <div className=''>
-      <h1 className=''>Welcome</h1>
-      <div className=''>{children}</div>
-    </div>
-  )
+  return <div className=''>{children}</div>
 }
 
-export default AuthLayout
+const AuthLayoutWithAuth = WithAuthHoc(AuthLayout)
+export default AuthLayoutWithAuth

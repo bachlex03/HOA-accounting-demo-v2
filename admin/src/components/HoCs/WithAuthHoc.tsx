@@ -1,11 +1,26 @@
+import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const WithAuthHoc = (WrappedComponent: React.ComponentType<any>) => {
   const WithAuth = (props: any) => {
-    const isAuthenticated = true // Replace with actual authentication logic
+    const { connection } = useConnection()
+    const anchorWallet = useAnchorWallet()
+    const wallet = useWallet()
+    const navigate = useNavigate()
 
-    if (!isAuthenticated) {
-      return <div>Please log in to access this page.</div> // Redirect or show a message
-    }
+    console.log('wallet', wallet)
+    console.log('anchorWallet', anchorWallet)
+
+    useEffect(() => {
+      console.log('connection', connection)
+      if (anchorWallet) {
+        navigate('/dashboard/accounting')
+      } else {
+        navigate('/sign-in')
+      }
+    }, [anchorWallet])
 
     return <WrappedComponent {...props} />
   }

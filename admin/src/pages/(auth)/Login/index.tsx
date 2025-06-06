@@ -1,11 +1,7 @@
-import React, { useState } from 'react'
-import { Eye, EyeOff, Building2, Lock, Mail } from 'lucide-react'
-import { ethers } from 'ethers'
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import { Building2 } from 'lucide-react'
+import { WalletConnectionButton } from '@/components/ConnectionWalletBtn'
 
 const LoginPage = () => {
-  const [ethAccount, setEthAccount] = useState(null)
-
   return (
     <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'>
       <div className='max-w-md w-full space-y-8'>
@@ -21,7 +17,7 @@ const LoginPage = () => {
         {/* Login Form */}
         <div className='bg-white py-8 px-6 shadow-lg rounded-lg'>
           <div>
-            <WalletMultiButton />
+            <WalletConnectionButton />
           </div>
           {/* Additional Links */}
           <div className='mt-6 text-center'>

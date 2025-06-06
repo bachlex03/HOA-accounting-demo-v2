@@ -17,6 +17,10 @@ import { GoAlert } from 'react-icons/go'
 import { HiOutlineHome, HiOutlineClipboardDocumentList } from 'react-icons/hi2'
 
 import NavItems from './NavItems'
+import { NavUser } from '@/components/nav-user'
+
+import { WalletDisconnectButton, WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import { WalletConnectionButton } from '@/components/ConnectionWalletBtn'
 
 // This is sample data.
 const data = {
@@ -194,24 +198,16 @@ const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size='lg' asChild>
-              <a href='#'>
-                <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
-                  <Command className='size-4' />
-                </div>
-                <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-semibold'>Acme Inc</span>
-                  <span className='truncate text-xs'>Enterprise</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
+            <WalletConnectionButton />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavItems projects={data.projects} />
       </SidebarContent>
-      <SidebarFooter>{/* <NavUser user={data.user} /> */}</SidebarFooter>
+      <SidebarFooter>
+        <NavUser />
+      </SidebarFooter>
     </Sidebar>
   )
 }
