@@ -43,7 +43,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
               <HeadingActions />
             </div>
           </header>
-          <main>{children}</main>
+          <main>
+            <div className='flex flex-col gap-4 p-4 pt-0'>{children}</div>
+          </main>
         </SidebarInset>
       </SidebarProvider>
     </Fragment>
