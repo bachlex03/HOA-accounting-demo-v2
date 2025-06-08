@@ -15,10 +15,15 @@ describe("sc-backend", () => {
   const ownerPubkey = owner.publicKey;
 
   const renter = anchor.web3.Keypair.generate();
+
   const renterPubkey = renter.publicKey;
+  const renterSecretKey = renter.secretKey;
 
   it("Initialize renter!", async () => {
     const renterName = "Foo Bar";
+
+    console.log("[LOG:VAR]::renterPubkey: ", renterPubkey.toString());
+    console.log("[LOG:VAR]::renterSecretKey: ", renterSecretKey.toString());
 
     const renterSeeds = [Buffer.from("RENTER_STATE"), renterPubkey.toBuffer()];
 

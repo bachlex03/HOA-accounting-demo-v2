@@ -12,8 +12,10 @@ import { CiFilter, CiSearch } from 'react-icons/ci'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import useAccounting from '@/hooks/use-accounting'
+import RenterList from './_components/RenterList'
+import RenterForm from './_components/RenterForm'
 
 const statusConfig = {
   PAID: {
@@ -82,7 +84,29 @@ const AccountingPage = () => {
         </div>
       </div>
 
-      <Separator className='my-10' />
+      <Separator className='mt-10 mb-5' />
+
+      <div className='flex justify-between items-center mb-5'>
+        <span></span>
+
+        <div className='flex gap-3'>
+          <RenterList>
+            <Button className='bg-[#6938DA] text-white text-[15px] h-[40px] w-[150px] hover:bg-[#8956FF] cursor-pointer font-semibold'>
+              Renter list
+            </Button>
+          </RenterList>
+          <RenterForm>
+            <Button
+              className='bg-[#6938DA] text-white text-[15px] rounded-full h-[40px] w-[150px] hover:bg-[#8956FF] cursor-pointer font-semibold'
+              onClick={() => {
+                // initializeRenter(new PublicKey('EQeNhVUmS75zr5QetxKwWWLNmdU5Npa7fZ1XzbLX2DQY'), 'Foo Bar')
+              }}
+            >
+              Create Renter
+            </Button>
+          </RenterForm>
+        </div>
+      </div>
 
       <div>
         <div className='flex justify-between'>
@@ -99,6 +123,7 @@ const AccountingPage = () => {
             </Select>
             <p className='w-md'>3 overdue payments</p>
           </div>
+
           <div className='flex gap-3 items-center'>
             <div className='relative'>
               <CiSearch className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
@@ -264,10 +289,12 @@ const AccountingPage = () => {
                           <div className='flex items-center mt-2'>
                             <p className='text-sm text-[#6F6F6F]'>Home Owner ID: 4567890</p>
 
-                            <Button className='bg-[#6938DA] text-white ml-auto w-[100px] h-[40px] font-light text-[15px] rounded-full'>
-                              <IoCheckmarkOutline size={20} />
-                              Done
-                            </Button>
+                            <DialogClose className=' ml-auto'>
+                              <Button className='bg-[#6938DA] text-white w-[100px] h-[40px] font-light text-[15px] rounded-full'>
+                                <IoCheckmarkOutline size={20} />
+                                Done
+                              </Button>
+                            </DialogClose>
                           </div>
                         </div>
                       </DialogContent>

@@ -1,7 +1,7 @@
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { useMemo } from 'react'
 import * as anchor from '@coral-xyz/anchor'
-import { smartContractIdl } from '@/infrastructure/anchor/setup'
+import { smartContractIdl, type smartContractIdlType } from '@/infrastructure/anchor/setup'
 
 const useSolanaProgram = () => {
   const { connection } = useConnection()
@@ -13,7 +13,7 @@ const useSolanaProgram = () => {
 
       anchor.setProvider(provider)
 
-      return new anchor.Program(smartContractIdl, provider)
+      return new anchor.Program<smartContractIdlType>(smartContractIdl, provider)
     }
   }, [connection, anchorWallet])
 

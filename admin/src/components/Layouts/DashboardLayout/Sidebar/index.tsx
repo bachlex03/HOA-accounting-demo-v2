@@ -20,7 +20,7 @@ import NavItems from './NavItems'
 import { NavUser } from '@/components/nav-user'
 
 import { WalletDisconnectButton, WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { WalletConnectionButton } from '@/components/ConnectionWalletBtn'
+import { WalletConnectionButton } from '@/components/ui/ConnectionWalletBtn'
 
 // This is sample data.
 const data = {

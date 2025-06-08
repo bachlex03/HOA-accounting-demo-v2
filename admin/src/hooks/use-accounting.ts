@@ -20,7 +20,7 @@ const useAccounting = () => {
         try {
           setIsLoading(true)
 
-          const feeChargeAccounts = await program.account.feeChargeAccount.add([
+          const feeChargeAccounts = await program.account.feeChargeAccount.all([
             {
               memcmp: {
                 offset: 8,
@@ -39,7 +39,7 @@ const useAccounting = () => {
     }
 
     fetchFeeCharges()
-  }, [initialized])
+  }, [publicKey, isTransactionPending])
 
   return {
     feeCharges
