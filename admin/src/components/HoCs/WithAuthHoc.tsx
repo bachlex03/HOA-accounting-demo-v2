@@ -13,7 +13,7 @@ const WithAuthHoc = (WrappedComponent: React.ComponentType<any>) => {
 
       useEffect(() => {
          if (anchorWallet && program) {
-            // navigate('/dashboard/accounting')
+            navigate('/dashboard/accounting')
          } else {
             navigate('/sign-in')
          }

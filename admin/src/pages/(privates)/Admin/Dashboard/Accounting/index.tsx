@@ -19,18 +19,10 @@ import { HandCoins } from 'lucide-react'
 import { LiaBalanceScaleRightSolid } from 'react-icons/lia'
 import { CiCreditCardOff, CiBookmark } from 'react-icons/ci'
 import { PiDotsThreeOutlineVertical } from 'react-icons/pi'
-import { IoCheckmarkOutline } from 'react-icons/io5'
-import { HiOutlineHome } from 'react-icons/hi2'
 import { CiFilter, CiSearch } from 'react-icons/ci'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import {
-   Dialog,
-   DialogClose,
-   DialogContent,
-   DialogTrigger,
-} from '@/components/ui/dialog'
 import useAccounting from '@/hooks/use-accounting'
 import RenterList from './_components/RenterList'
 import RenterForm from './_components/RenterForm'
