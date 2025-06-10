@@ -6,8 +6,7 @@ import { PublicKey } from '@solana/web3.js'
 const RenterCreateSchema = z.object({
    public_key: z
       .custom<PublicKey>(
-         (value: unknown) => {
-            if (typeof value !== 'string') return false
+         (value: string) => {
             try {
                const publicKey = new PublicKey(value)
                return PublicKey.isOnCurve(publicKey)
@@ -20,6 +19,11 @@ const RenterCreateSchema = z.object({
          },
       )
       .transform((value) => new PublicKey(value)),
+   secret_key: z.array(z.number().int(), {
+      required_error: 'Secret key is required',
+   }),
+   private_key: z.string().min(1, 'Private key is required'),
+   mnemonic: z.string().min(1, 'Mnemonic is required'),
    renter_name: z.string().min(1, 'Renter name is required'),
 } satisfies Record<keyof IAddRenterPayload, z.ZodTypeAny>)
 

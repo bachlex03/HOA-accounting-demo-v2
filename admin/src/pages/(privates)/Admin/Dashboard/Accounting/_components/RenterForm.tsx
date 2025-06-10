@@ -13,27 +13,81 @@ import {
    addRenterResolver,
    type TAddRenterPayload,
 } from '@/domain/schemas/renter.schema'
-import InputField from '@/components/ui/InputField'
+import InputField from '@/components/fields/InputField'
 import useRenter from '@/hooks/use-renter'
 import { HiOutlinePlusSmall } from 'react-icons/hi2'
+import * as bs58 from 'bs58'
+import * as bip39 from 'bip39'
+import { useEffect } from 'react'
+import { Keypair } from '@solana/web3.js'
+import { HDKey } from 'micro-ed25519-hdkey'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
 const RenterForm = ({ children }: { children?: React.ReactNode }) => {
-   const { initializeRenter } = useRenter()
+   const { initializeRenter, isLoading, refetch } = useRenter()
 
    const form = useForm<TAddRenterPayload>({
       resolver: addRenterResolver,
    })
 
-   const onSubmit = (data: TAddRenterPayload) => {
-      console.log('Form submitted with data:', data)
-      // Here you would typically call a function to handle the form submission,
-      // such as sending the data to an API or updating the state.
+   const generateKeys = async () => {
+      const mnemonic = bip39.generateMnemonic()
+      console.log('[LOG:VAR]::mnemonic: ', mnemonic)
+      const seed = bip39.mnemonicToSeedSync(mnemonic, '')
+      console.log('[LOG:VAR]::seed: ', seed)
+      // derive HD key from seed
+      const hdKey = HDKey.fromMasterSeed(seed.toString('hex'))
+      // derive keypair from HD key and specified path
+      const keypair = Keypair.fromSeed(
+         hdKey.derive(`m/44'/501'/0'/0'`).privateKey,
+      )
+      console.log(
+         '[LOG:VAR]::keypair.publicKey: ',
+         keypair.publicKey.toBase58(),
+      )
+      console.log('[LOG:VAR]::keypair.secretKey: ', keypair.secretKey)
+      console.log(
+         '[LOG:VAR]::keypair.secretKey: ',
+         keypair.secretKey.toString(),
+      )
+      const privateKeyBase58 = bs58.default.encode(keypair.secretKey) // Convert to base58
+      console.log('[LOG:VAR]::privateKeyBase58: ', privateKeyBase58)
 
-      initializeRenter(data)
+      // Prepare wallet data
+      const walletData = {
+         timestamp: new Date().toISOString(),
+         mnemonic: mnemonic,
+         seed: seed.toString('hex'),
+         publicKey: keypair.publicKey.toBase58(),
+         privateKey: privateKeyBase58,
+         secretKey: Array.from(keypair.secretKey),
+         derivationPath: "m/44'/501'/0'/0'",
+      }
+
+      console.log('walletData', walletData)
+
+      form.setValue('public_key', keypair.publicKey)
+      form.setValue('secret_key', Array.from(keypair.secretKey))
+      form.setValue('private_key', privateKeyBase58)
+      form.setValue('mnemonic', mnemonic)
    }
 
+   const onSubmit = async (data: TAddRenterPayload) => {
+      console.log('Form submitted with data:', data)
+
+      await initializeRenter(data)
+
+      // refetch()
+      form.reset()
+      generateKeys()
+   }
+
+   useEffect(() => {
+      generateKeys()
+   }, [])
    return (
       <Dialog>
+         <LoadingOverlay isLoading={isLoading} fullScreen />
          <DialogTrigger>{children}</DialogTrigger>
 
          <DialogContent className="!w-[600px] !max-w-[600px]">
@@ -50,8 +104,9 @@ const RenterForm = ({ children }: { children?: React.ReactNode }) => {
                      <InputField
                         form={form}
                         name="public_key"
-                        label="Renter Public Key"
-                        description="Enter the public key of the renter"
+                        label="Public Key"
+                        description="Enter the name of the renter"
+                        disabled={true}
                      />
 
                      <InputField

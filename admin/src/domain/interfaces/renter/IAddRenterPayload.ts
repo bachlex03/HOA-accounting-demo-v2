@@ -1,6 +1,9 @@
-import type { PublicKey } from '@solana/web3.js';
+import type { PublicKey } from '@solana/web3.js'
 
 export interface IAddRenterPayload {
-   public_key: PublicKey;
-   renter_name: string;
+   public_key: PublicKey
+   secret_key: number[]
+   private_key: string
+   mnemonic: string
+   renter_name: string
 }

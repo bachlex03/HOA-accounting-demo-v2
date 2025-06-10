@@ -12,7 +12,7 @@ pub fn add_fee_charge(ctx: Context<AddFeeCharge>, _fee_type: String, _amount: u6
     let (fee_type, amount, due_date) = validate_input(&_fee_type, _amount, _due_date)?;
 
     fee_charge_account.from_admin = ctx.accounts.from_authority.key();
-    fee_charge_account.to_renter = renter_account.key();
+    fee_charge_account.to_renter = renter_account.owner.key();
     fee_charge_account.fee_id = renter_account.next_fee_id;
     fee_charge_account.status = EFeeStatus::Unpaid;
     fee_charge_account.fee_type = fee_type;

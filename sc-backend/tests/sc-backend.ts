@@ -2,7 +2,10 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { ScBackend } from "../target/types/sc_backend";
 import * as bs58 from "bs58";
+import * as bip39 from "bip39";
+import { HDKey } from "micro-ed25519-hdkey";
 import assert from "assert";
+import { Keypair } from "@solana/web3.js";
 
 describe("sc-backend", () => {
   // Configure the client to use the local cluster.
@@ -14,16 +17,57 @@ describe("sc-backend", () => {
   const owner = anchor.AnchorProvider.local().wallet;
   const ownerPubkey = owner.publicKey;
 
-  const renter = anchor.web3.Keypair.generate();
+  // const renter = anchor.web3.Keypair.generate();
 
+  // const renterPubkey = renter.publicKey;
+  // const renterSecretKey = renter.secretKey;
+
+  const mnemonic = bip39.generateMnemonic();
+  console.log("[LOG:VAR]::mnemonic: ", mnemonic);
+
+  const seed = bip39.mnemonicToSeedSync(mnemonic, "");
+  console.log("[LOG:VAR]::seed: ", seed);
+
+  // derive HD key from seed
+  const hdKey = HDKey.fromMasterSeed(seed.toString("hex"));
+
+  // derive keypair from HD key and specified path
+  const keypair = Keypair.fromSeed(hdKey.derive(`m/44'/501'/0'/0'`).privateKey);
+
+  console.log("[LOG:VAR]::keypair.publicKey: ", keypair.publicKey.toBase58());
+  console.log("[LOG:VAR]::keypair.secretKey: ", keypair.secretKey);
+  console.log("[LOG:VAR]::keypair.secretKey: ", keypair.secretKey.toString());
+
+  const privateKeyBase58 = bs58.default.encode(keypair.secretKey); // Convert to base58
+  console.log("[LOG:VAR]::privateKeyBase58: ", privateKeyBase58);
+
+  const renter = keypair; // Use the generated keypair as renter
   const renterPubkey = renter.publicKey;
-  const renterSecretKey = renter.secretKey;
 
   it("Initialize renter!", async () => {
     const renterName = "Foo Bar";
 
-    console.log("[LOG:VAR]::renterPubkey: ", renterPubkey.toString());
-    console.log("[LOG:VAR]::renterSecretKey: ", renterSecretKey.toString());
+    // way 2
+    // const mnemonic = bip39.generateMnemonic();
+    // console.log("[LOG:VAR]::mnemonic: ", mnemonic);
+
+    // const seed = await bip39.mnemonicToSeed(mnemonic);
+    // console.log("[LOG:VAR]::seed: ", seed);
+
+    // const derivedSeed = derivePath(
+    //   "m/44'/501'/0'/0'",
+    //   seed.toString("hex")
+    // ).key;
+    // console.log("[LOG:VAR]::derivedSeed: ", derivedSeed);
+
+    // const keypair = Keypair.fromSeed(derivedSeed.slice(0, 32));
+
+    // console.log("[LOG:VAR]::keypair.publicKey: ", keypair.publicKey.toBase58());
+    // console.log("[LOG:VAR]::keypair.secretKey: ", keypair.secretKey);
+    // console.log("[LOG:VAR]::keypair.secretKey: ", keypair.secretKey.toString());
+
+    // const privateKeyBase58 = bs58.default.encode(keypair.secretKey); // Convert to base58
+    // console.log("[LOG:VAR]::privateKeyBase58: ", privateKeyBase58);
 
     const renterSeeds = [Buffer.from("RENTER_STATE"), renterPubkey.toBuffer()];
 
@@ -46,6 +90,10 @@ describe("sc-backend", () => {
     console.log(
       "[LOG:VAR]::enterAccount.renterName: ",
       renterAccount.renterName
+    );
+    console.log(
+      "[LOG:VAR]::enterAccount.owner: ",
+      renterAccount.owner.toBase58()
     );
     console.log("[LOG:VAR]::enterAccount.bump: ", renterAccount.bump);
     console.log(
@@ -76,12 +124,18 @@ describe("sc-backend", () => {
       renterAccountSeeds,
       program.programId
     );
+    console.log("renterAccountPDA", renterAccountPDA.toBase58());
+
     const renterAccountData = await program.account.renterAccount.fetch(
       renterAccountPDA
     );
     console.log(
       "[LOG:VAR]::renterAccountData.renterName: ",
       renterAccountData.renterName
+    );
+    console.log(
+      "[LOG:VAR]::renterAccountData.owner: ",
+      renterAccountData.owner.toBase58()
     );
     console.log(
       "[LOG:VAR]::renterAccountData.nextFeeId: ",
@@ -117,6 +171,10 @@ describe("sc-backend", () => {
 
     const feeChargeAccount = await program.account.feeChargeAccount.fetch(
       feeChargeAccountPDA
+    );
+    console.log(
+      "[LOG:VAR]::feeChargeAccount.toRenter: ",
+      feeChargeAccount.toRenter.toBase58()
     );
     console.log(
       "[LOG:VAR]::feeChargeAccount.feeType: ",

@@ -1,37 +1,28 @@
-import {
-   Sidebar,
-   SidebarContent,
-   SidebarFooter,
-   SidebarHeader,
-   SidebarMenu,
-   SidebarMenuButton,
-   SidebarMenuItem,
-} from '@/components/ui/sidebar'
+import * as React from 'react'
 import {
    AudioWaveform,
    BookOpen,
    Bot,
    Command,
+   Frame,
    GalleryVerticalEnd,
+   Map,
+   PieChart,
    Settings2,
    SquareTerminal,
 } from 'lucide-react'
-import { PiMoneyWavy } from 'react-icons/pi'
-import { GrOverview } from 'react-icons/gr'
-import { MdOutlineAnnouncement } from 'react-icons/md'
-import { IoCalendarClearOutline, IoDocumentTextOutline } from 'react-icons/io5'
-import { BsListTask, BsGrid3X2, BsTruck } from 'react-icons/bs'
-import { GoAlert } from 'react-icons/go'
-import { HiOutlineHome, HiOutlineClipboardDocumentList } from 'react-icons/hi2'
 
-import NavItems from './NavItems'
+import { NavMain } from '@/components/layouts/DashboardLayout/_components/nav-main'
+import { NavProjects } from '@/components/layouts/DashboardLayout/_components/nav-projects'
 import { NavUser } from '@/components/layouts/DashboardLayout/_components/nav-user'
-
+import { TeamSwitcher } from '@/components/layouts/DashboardLayout/_components/team-switcher'
 import {
-   WalletDisconnectButton,
-   WalletMultiButton,
-} from '@solana/wallet-adapter-react-ui'
-import { WalletConnectionButton } from '@/components/ConnectionWalletBtn'
+   Sidebar,
+   SidebarContent,
+   SidebarFooter,
+   SidebarHeader,
+   SidebarRail,
+} from '@/components/ui/sidebar'
 
 // This is sample data.
 const data = {
@@ -146,80 +137,35 @@ const data = {
    ],
    projects: [
       {
-         name: 'Overview',
+         name: 'Design Engineering',
          url: '#',
-         icon: GrOverview,
+         icon: Frame,
       },
       {
-         name: 'Announcements',
+         name: 'Sales & Marketing',
          url: '#',
-         icon: MdOutlineAnnouncement,
+         icon: PieChart,
       },
       {
-         name: 'Calendar',
+         name: 'Travel',
          url: '#',
-         icon: IoCalendarClearOutline,
-      },
-      {
-         name: 'Task Management',
-         url: '#',
-         icon: BsListTask,
-      },
-      {
-         name: 'Projects',
-         url: '#',
-         icon: BsGrid3X2,
-      },
-      {
-         name: 'Vendors',
-         url: '#',
-         icon: BsTruck,
-      },
-      {
-         name: 'Violation Reports',
-         url: '#',
-         icon: GoAlert,
-      },
-      {
-         name: 'Accounting',
-         url: '#',
-         icon: PiMoneyWavy,
-      },
-      {
-         name: 'Home Owners',
-         url: '#',
-         icon: HiOutlineHome,
-      },
-      {
-         name: 'Documents',
-         url: '#',
-         icon: IoDocumentTextOutline,
-      },
-      {
-         name: 'Reports',
-         url: '#',
-         icon: HiOutlineClipboardDocumentList,
+         icon: Map,
       },
    ],
 }
 
-const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
    return (
-      <Sidebar variant="inset" {...props}>
+      <Sidebar collapsible="icon" {...props}>
          <SidebarHeader>
-            <SidebarMenu>
-               <SidebarMenuItem>
-                  <WalletConnectionButton />
-               </SidebarMenuItem>
-            </SidebarMenu>
+            <TeamSwitcher teams={data.teams} />
          </SidebarHeader>
          <SidebarContent>
-            <NavItems projects={data.projects} />
+            <NavMain items={data.navMain} />
+            <NavProjects projects={data.projects} />
          </SidebarContent>
-         <SidebarFooter>
-            <NavUser />
-         </SidebarFooter>
+         <SidebarFooter>{/* <NavUser user={data.user} /> */}</SidebarFooter>
+         <SidebarRail />
       </Sidebar>
    )
 }
-export default SidebarLayout
