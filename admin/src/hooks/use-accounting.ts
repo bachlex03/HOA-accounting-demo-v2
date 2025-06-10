@@ -9,10 +9,10 @@ import * as anchor from '@coral-xyz/anchor'
 const useAccounting = () => {
    const { program } = useSolanaProgram()
    const { publicKey } = useWallet()
-   const [initialized, setInitialized] = useState(false)
    const [feeCharges, setFeeCharges] = useState<any>([])
    const [isLoading, setIsLoading] = useState(false)
    const [isSuccessAddFee, setIsSuccessAddFee] = useState(false)
+   const [feeChargesOfRenter, setFeeChargesOfRenter] = useState<any>([])
 
    useEffect(() => {
       // fetch fee charges
@@ -30,6 +30,8 @@ const useAccounting = () => {
                         },
                      },
                   ])
+
+               console.log('feeChargeAccounts', feeChargeAccounts)
 
                setFeeCharges(feeChargeAccounts)
             } catch (error) {
@@ -140,6 +142,37 @@ const useAccounting = () => {
       }
    }
 
+   const getFeesOfRenter = async (publicKey: PublicKey) => {
+      if (program && publicKey && publicKey) {
+         try {
+            setIsLoading(true)
+
+            const feeChargeAccounts =
+               await program.account.feeChargeAccount.all([
+                  {
+                     memcmp: {
+                        offset: 8 + 32,
+                        bytes: publicKey.toBase58(),
+                     },
+                  },
+               ])
+
+            console.log('feeChargeAccounts', feeChargeAccounts)
+
+            setFeeChargesOfRenter(feeChargeAccounts)
+
+            return feeChargeAccounts || []
+         } catch (error) {
+            console.error('Error fetching fee charges:', error)
+            return []
+         } finally {
+            setTimeout(() => {
+               setIsLoading(false)
+            }, 500)
+         }
+      }
+   }
+
    const unpaidFees = useMemo(
       () => feeCharges.filter((fee: any) => fee.account.status === 'unpaid'),
       [feeCharges],
@@ -153,7 +186,9 @@ const useAccounting = () => {
       feeCharges,
       unpaidFees,
       orderDueFees,
+      feeChargesOfRenter,
       addFeeCharge,
+      getFeesOfRenter,
       isLoading,
       isSuccessAddFee,
    }

@@ -303,6 +303,19 @@ describe("sc-backend", () => {
     console.log("[LOG:VAR]::feeChargeAccount: ", feeChargeAccount);
   });
 
+  it("Fetch all fees of renter 2", async () => {
+    const feesOfRenter = await program.account.feeChargeAccount.all([
+      {
+        memcmp: {
+          offset: 8 + 32,
+          bytes: renterPubkey.toBase58(),
+        },
+      },
+    ]);
+
+    console.log("[LOG:VAR]::feesOfRenter: ", feesOfRenter);
+  });
+
   it("Fetch all unpaid fees", async () => {
     const unpaidFees = await program.account.feeChargeAccount.all([
       {

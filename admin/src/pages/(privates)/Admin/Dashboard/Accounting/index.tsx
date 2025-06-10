@@ -36,6 +36,8 @@ import RenterList from './_components/RenterList'
 import RenterForm from './_components/RenterForm'
 import type { PublicKey } from '@solana/web3.js'
 import useRenter from '@/hooks/use-renter'
+import { useState } from 'react'
+import RenterFeeChargeList from './_components/RenterFeeChargeList'
 
 const statusConfig = {
    PAID: {
@@ -52,9 +54,11 @@ const statusConfig = {
 type TFeeCharge = {
    publicKey: PublicKey
    renter: {
+      owner: PublicKey
       renterName: string
    }
    account: {
+      toRenter: PublicKey
       amount: number
       dueDate: Date
       feeType: string
@@ -66,17 +70,14 @@ const AccountingPage = () => {
    const { unpaidFees, orderDueFees, feeCharges } = useAccounting()
    const { renters } = useRenter()
 
-   renters.map((renter: any) => {
-      console.log('renter', renter)
-      console.log('renter.publicKey', renter.publicKey.toBase58())
-      console.log('renter.account.owner', renter.account.owner.toBase58())
-   })
-
-   feeCharges.map((fee: any) => {
-      console.log('fee', fee)
-      console.log('fee.publicKey', fee.publicKey.toBase58())
-      console.log('fee.account.toRenter', fee.account.toRenter.toBase58())
-   })
+   const [selectedRenter, setSelectedRenter] = useState<{
+      publicKey: PublicKey
+      account: {
+         renterName: string
+         owner: PublicKey
+         nextFeeId: number
+      }
+   } | null>(null)
 
    const TFeeCharges: TFeeCharge[] = feeCharges.map((fee: any) => {
       const feeTypeKey = Object.keys(fee.account.feeType)[0]
@@ -99,6 +100,7 @@ const AccountingPage = () => {
             renterName: renter?.account.renterName,
          },
          account: {
+            toRenter: fee.account.toRenter,
             amount: fee.account.amount.toNumber(),
             dueDate: dueDate,
             feeType: feeTypeKey.toUpperCase(),
@@ -249,6 +251,25 @@ const AccountingPage = () => {
                         | 'PAID'
                         | 'OVERDUE'
 
+                     const renter = renters.find((renter) => {
+                        console.log('fee', fee)
+                        console.log(
+                           'fee.account.toRenter',
+                           fee.account.toRenter.toBase58(),
+                        )
+
+                        console.log(
+                           'renter.account.owner.toBase58()',
+                           renter.account.owner.toBase58(),
+                        )
+                        return (
+                           renter.account.owner.toBase58() ===
+                           fee.account.toRenter.toBase58()
+                        )
+                     })
+
+                     console.log('renter 2', renter)
+
                      return (
                         <TableRow key={index}>
                            <TableCell className="transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50 animate-fadeIn border border-slate-200 dark:border-slate-700">
@@ -289,154 +310,31 @@ const AccountingPage = () => {
                            </TableCell>
 
                            <TableCell className="transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50 animate-fadeIn border border-slate-200 dark:border-slate-700">
-                              <Dialog>
-                                 <DialogTrigger>
-                                    <Button variant={'ghost'}>
-                                       <PiDotsThreeOutlineVertical size={20} />
-                                    </Button>
-                                 </DialogTrigger>
-                                 <DialogContent className="!w-[600px] !max-w-[600px]">
-                                    <div>
-                                       <span className="flex items-center gap-2 mb-4 pb-5 border-b">
-                                          <HiOutlineHome
-                                             size={24}
-                                             className="text-[#8956FF]"
-                                          />
-                                          <h3 className="text-xl font-medium text-[#6F6F6F]">
-                                             Roger Rosser
-                                          </h3>
-                                       </span>
-
-                                       <div className="flex flex-col gap-5">
-                                          <div className="flex items-center gap-5">
-                                             <span className="flex gap-2">
-                                                <LiaBalanceScaleRightSolid className="text-[24px] text-[#8956FF]" />
-
-                                                <p className="text-[15px] text-[#6F6F6F] font-medium min-w-[130px]">
-                                                   Current Balance
-                                                </p>
-                                             </span>
-
-                                             <p className="text-[15px] font-medium">
-                                                -$124
-                                             </p>
-                                          </div>
-
-                                          <div className="flex items-center gap-5">
-                                             <span className="flex gap-2">
-                                                <LiaBalanceScaleRightSolid className="text-[24px] text-[#8956FF]" />
-
-                                                <p className="text-[15px] text-[#6F6F6F] font-medium min-w-[130px]">
-                                                   Open Charges
-                                                </p>
-                                             </span>
-
-                                             <p className="text-[15px] font-medium">
-                                                -$124
-                                             </p>
-                                          </div>
-
-                                          <div className="flex items-center justify-between gap-5">
-                                             <span className="flex gap-2">
-                                                <LiaBalanceScaleRightSolid className="text-[24px] text-[#8956FF]" />
-
-                                                <p className="text-[15px] text-[#6F6F6F] font-medium">
-                                                   Payment History
-                                                </p>
-                                             </span>
-
-                                             <div className="flex items-center">
-                                                <Select>
-                                                   <SelectTrigger className="w-[150px]">
-                                                      <SelectValue placeholder="All" />
-                                                   </SelectTrigger>
-                                                   <SelectContent>
-                                                      <SelectItem value="light">
-                                                         All
-                                                      </SelectItem>
-                                                      <SelectItem value="dark">
-                                                         Late payments
-                                                      </SelectItem>
-                                                   </SelectContent>
-                                                </Select>
-                                             </div>
-                                          </div>
-                                       </div>
-
-                                       {/* Table */}
-                                       <div className="mt-5">
-                                          <Table className="border">
-                                             <TableHeader>
-                                                <TableRow className="bg-[#F3EEFF] dark:bg-slate-800/50 dark:hover:bg-slate-800/50">
-                                                   <TableHead className="font-medium w-[15%] border">
-                                                      Month
-                                                   </TableHead>
-                                                   <TableHead className="font-medium w-[15%] border">
-                                                      Payment Type
-                                                   </TableHead>
-                                                   <TableHead className="font-medium w-[15%] border">
-                                                      Amount
-                                                   </TableHead>
-                                                </TableRow>
-                                             </TableHeader>
-                                             <TableBody>
-                                                {Array.from({ length: 5 }).map(
-                                                   (_, index) => {
-                                                      return (
-                                                         <TableRow key={index}>
-                                                            <TableCell className="transition-all text-sm font-light hover:bg-slate-50 dark:hover:bg-slate-800/50 animate-fadeIn border border-slate-200 dark:border-slate-700">
-                                                               January 2025
-                                                            </TableCell>
-                                                            <TableCell className="transition-all text-sm font-light hover:bg-slate-50 dark:hover:bg-slate-800/50 animate-fadeIn border border-slate-200 dark:border-slate-700">
-                                                               Monthly
-                                                            </TableCell>
-                                                            <TableCell
-                                                               className={cn(
-                                                                  'transition-all text-sm font-light hover:bg-slate-50 dark:hover:bg-slate-800/50 animate-fadeIn border border-slate-200 dark:border-slate-700',
-                                                                  {
-                                                                     'text-red-500':
-                                                                        index %
-                                                                           2 !==
-                                                                        0,
-                                                                  },
-                                                               )}
-                                                            >
-                                                               {index % 2 ===
-                                                               0 ? (
-                                                                  <p>$124</p>
-                                                               ) : (
-                                                                  <p>-$124</p>
-                                                               )}
-                                                            </TableCell>
-                                                         </TableRow>
-                                                      )
-                                                   },
-                                                )}
-                                             </TableBody>
-                                          </Table>
-                                       </div>
-
-                                       <div className="flex mt-5">
-                                          <p className="text-sm text-[#6F6F6F]">
-                                             Page 1 of 3
-                                          </p>
-                                       </div>
-
-                                       <div className="flex items-center mt-2">
-                                          <p className="text-sm text-[#6F6F6F]">
-                                             Home Owner ID: 4567890
-                                          </p>
-
-                                          <DialogClose className=" ml-auto">
-                                             <Button className="bg-[#6938DA] text-white w-[100px] h-[40px] font-light text-[15px] rounded-full">
-                                                <IoCheckmarkOutline size={20} />
-                                                Done
-                                             </Button>
-                                          </DialogClose>
-                                       </div>
-                                    </div>
-                                 </DialogContent>
-                              </Dialog>
+                              <RenterFeeChargeList
+                                 selectedRenter={selectedRenter}
+                                 disabled={!renter}
+                              >
+                                 <Button
+                                    variant={'ghost'}
+                                    disabled={!renter}
+                                    onClick={() => {
+                                       if (renter) {
+                                          setSelectedRenter({
+                                             publicKey: renter.publicKey,
+                                             account: {
+                                                renterName:
+                                                   renter.account.renterName,
+                                                owner: renter.account.owner,
+                                                nextFeeId:
+                                                   renter.account.nextFeeId.toNumber(),
+                                             },
+                                          })
+                                       }
+                                    }}
+                                 >
+                                    <PiDotsThreeOutlineVertical size={20} />
+                                 </Button>
+                              </RenterFeeChargeList>
                            </TableCell>
                         </TableRow>
                      )
