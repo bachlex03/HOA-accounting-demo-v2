@@ -10,34 +10,34 @@ import DashboardLayoutWithAuth from './components/layouts/DashboardLayout'
 import AuthLayoutWithAuth from './components/layouts/AuthLayout'
 
 type Route = {
-  path: string
-  component: React.ComponentType
-  layout?: FC<any> | null
+   path: string
+   component: React.ComponentType
+   layout?: FC<any> | null
 }
 
 const publicRoutes: Route[] = [
-  {
-    path: '/',
-    component: RootPage,
-    layout: PublicLayout
-  },
-  {
-    path: '/sign-in',
-    component: LoginPage,
-    layout: AuthLayoutWithAuth
-  }
+   {
+      path: '/',
+      component: RootPage,
+      layout: PublicLayout,
+   },
+   {
+      path: '/sign-in',
+      component: LoginPage,
+      layout: AuthLayoutWithAuth,
+   },
 ]
 const privateRoutes: Route[] = [
-  {
-    path: '/dashboard/accounting',
-    component: AccountingPage,
-    layout: DashboardLayoutWithAuth
-  },
-  {
-    path: 'client/accounting-management',
-    component: AccountingManagementPage,
-    layout: ClientLayoutWithAuth
-  }
+   {
+      path: '/dashboard/accounting',
+      component: AccountingPage,
+      layout: DashboardLayoutWithAuth,
+   },
+   {
+      path: '/client/accounting-management',
+      component: AccountingManagementPage,
+      layout: ClientLayoutWithAuth,
+   },
 ]
 
 export { publicRoutes, privateRoutes }
