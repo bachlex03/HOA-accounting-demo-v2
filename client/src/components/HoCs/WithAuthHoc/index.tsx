@@ -1,7 +1,7 @@
 import useProgram from "@/hooks/useProgram";
 import getProvider from "@/infrastructure/utils/getProvider";
 import type { PublicKey } from "@solana/web3.js";
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -14,7 +14,7 @@ const WithAuthHoc = (WrappedComponent: React.ComponentType<any>) => {
     const provider = getProvider();
 
     // Handle navigation based on auth state - use useLayoutEffect to prevent flash
-    useLayoutEffect(() => {
+    useEffect(() => {
       if (!connecting) {
         if (connected && publicKey) {
           // Both connected and publicKey exist - navigate to accounting
@@ -32,6 +32,18 @@ const WithAuthHoc = (WrappedComponent: React.ComponentType<any>) => {
         provider.on("connect", (publicKey: PublicKey) => {
           console.log("Connected public key:", publicKey.toBase58());
         });
+
+        // Will either automatically connect to Phantom, or do nothing.
+        provider
+          .connect({ onlyIfTrusted: true })
+          .then(({ publicKey }) => {
+            // Handle successful eager connection
+            console.log(`Eagerly connected to ${publicKey.toBase58()}`);
+          })
+          .catch(() => {
+            // Handle connection failure as usual
+            console.error("Failed to eagerly connect to Phantom wallet.");
+          });
 
         // Handle account changes
         provider.on("accountChanged", (publicKey) => {

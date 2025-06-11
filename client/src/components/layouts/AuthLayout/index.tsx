@@ -11,13 +11,13 @@ const AuthLayout: FC<{
   const { connected } = useProgram();
 
   useEffect(() => {
-    if (connected) {
-      setIsAuth(false);
-    }
+    setTimeout(() => {
+      setIsAuth(!isAuth);
+    }, 500); // Simulate loading delay
   }, [connected]);
 
   if (isAuth) {
-    return <LoadingOverlay isLoading={true} fullScreen />;
+    return <LoadingOverlay isLoading={isAuth} fullScreen />;
   }
 
   return <div className="layout">{children}</div>;
