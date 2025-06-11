@@ -1,23 +1,13 @@
 import { WalletConnectionButton } from "@/components/customs/WalletConnectionBtn";
 import FeeChargeTable from "./_components/FeeChargeTable";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DollarSign,
   CreditCard,
   Receipt,
   Calendar,
-  Download,
-  Eye,
   AlertCircle,
   CircleUserRound,
 } from "lucide-react";
@@ -33,37 +23,6 @@ const AccountingPage = () => {
     nextPaymentDue: "2024-02-01",
     status: "overdue" as const,
   };
-
-  const recentTransactions = [
-    {
-      id: 1,
-      date: "2024-01-15",
-      description: "Monthly HOA Fee",
-      amount: -500.0,
-      status: "pending",
-    },
-    {
-      id: 2,
-      date: "2024-01-01",
-      description: "Payment Received",
-      amount: 500.0,
-      status: "completed",
-    },
-    {
-      id: 3,
-      date: "2023-12-15",
-      description: "Late Fee",
-      amount: -25.0,
-      status: "completed",
-    },
-    {
-      id: 4,
-      date: "2023-12-01",
-      description: "Monthly HOA Fee",
-      amount: -500.0,
-      status: "completed",
-    },
-  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -113,7 +72,7 @@ const AccountingPage = () => {
                     Renter name
                   </p>
                   <p className="text-sm font-semibold text-gray-900">
-                    {renterAccount.data.renterName}
+                    {renterAccount?.data.renterName}
                   </p>
                 </div>
               </div>
@@ -128,7 +87,8 @@ const AccountingPage = () => {
                   Account Created
                 </p>
                 <p className="text-sm font-semibold text-gray-900">
-                  {new Date(renterAccount.data.createAt).toLocaleDateString()}
+                  {renterAccount?.data?.createAt &&
+                    new Date(renterAccount.data.createAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
@@ -216,147 +176,8 @@ const AccountingPage = () => {
         </Card>
       </div>
 
-      {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="transactions">Transactions</TabsTrigger>
-          <TabsTrigger value="fees">Fee Schedule</TabsTrigger>
-          <TabsTrigger value="statements">Statements</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Recent Transactions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Transactions</CardTitle>
-                <CardDescription>Your latest account activity</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentTransactions.slice(0, 4).map((transaction) => (
-                    <div
-                      key={transaction.id}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">
-                          {transaction.description}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {transaction.date}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p
-                          className={`text-sm font-medium ${
-                            transaction.amount > 0
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {transaction.amount > 0 ? "+" : ""}$
-                          {Math.abs(transaction.amount).toFixed(2)}
-                        </p>
-                        <Badge
-                          variant={
-                            transaction.status === "completed"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {transaction.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <Button variant="outline" className="w-full mt-4">
-                  <Eye className="mr-2 h-4 w-4" />
-                  View All Transactions
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Payment Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>
-                  Manage your account and payments
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button className="w-full" size="lg">
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Make Payment
-                </Button>
-                <Button variant="outline" className="w-full">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Set Up Auto-Pay
-                </Button>
-                <Button variant="outline" className="w-full">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Statement
-                </Button>
-                <Button variant="outline" className="w-full">
-                  <Receipt className="mr-2 h-4 w-4" />
-                  Payment History
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="transactions" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Transaction History</CardTitle>
-              <CardDescription>
-                Complete record of all account transactions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* This would be your enhanced transaction table */}
-              <div className="text-center py-8 text-muted-foreground">
-                <Receipt className="mx-auto h-12 w-12 mb-4" />
-                <p>Detailed transaction table will be implemented here</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="fees" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Fee Schedule</CardTitle>
-              <CardDescription>Current HOA fees and charges</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <FeeChargeTable />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="statements" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Statements</CardTitle>
-              <CardDescription>
-                Download and view your monthly statements
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                <Download className="mx-auto h-12 w-12 mb-4" />
-                <p>Statement management will be implemented here</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Fee Charge Table */}
+      <FeeChargeTable />
     </div>
   );
 };

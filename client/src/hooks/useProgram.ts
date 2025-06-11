@@ -28,6 +28,7 @@ const useProgram = (): UseProgramReturn => {
   const wallet = useAnchorWallet();
 
   let program;
+
   if (wallet) {
     // Create a provider with the wallet for transaction signing
     const provider = new anchor.AnchorProvider(connection, wallet, {

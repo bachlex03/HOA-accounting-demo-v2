@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import useProgram from "@/hooks/useProgram";
 import { useEffect, useLayoutEffect, useState, type FC } from "react";
 import { useNavigate } from "react-router-dom";
+import GlobalLayout from "../GlobalLayout";
 
 const PrivateLayout: FC<{
   children?: React.ReactNode;
@@ -30,9 +31,11 @@ const PrivateLayout: FC<{
   }
 
   return (
-    <AuthProvider>
-      <div className="layout">{children}</div>
-    </AuthProvider>
+    <GlobalLayout>
+      <AuthProvider>
+        <div className="layout">{children}</div>
+      </AuthProvider>
+    </GlobalLayout>
   );
 };
 

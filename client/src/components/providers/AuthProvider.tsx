@@ -22,7 +22,7 @@ type RenterAccount = {
 
 // Define the shape of the context value for TypeScript (optional but recommended)
 type AuthContextType = {
-  renterAccount: RenterAccount;
+  renterAccount: RenterAccount | null;
   isFetching: boolean;
 };
 
@@ -32,16 +32,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { program, connection, publicKey } = useProgram();
-  const [renterAccount, setRenterAccount] = useState<RenterAccount>({
-    pdaPubkey: PublicKey.default,
-    data: {
-      owner: PublicKey.default,
-      renterName: "",
-      nextFeeId: 0,
-      createAt: 0,
-      updateAt: 0,
-    },
-  });
+  const [renterAccount, setRenterAccount] = useState<RenterAccount | null>(
+    null
+  );
   const [isFetching, setIsFetching] = useState(false);
 
   console.log("Auth Provider");
