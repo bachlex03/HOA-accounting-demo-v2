@@ -1,4 +1,3 @@
-import { LoadingOverlay } from '@/components/customs/LoadingOverlay'
 import type { TRenterTable } from './RenterTable'
 import {
    Dialog,
@@ -39,10 +38,11 @@ const AddFeeChargeForm = ({
    children: React.ReactNode
    selectedRenter: TRenterTable | null
 }) => {
-   const [isDialogOpen, setIsDialogOpen] = useState(false)
    const {
       feeChargeAccount: { addFeeChargeAsync, isFetching },
    } = useAccountingPage()
+
+   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
    const form = useForm<TAddFeeChargePayload>({
       resolver: addFeeChargeResolver,
@@ -51,6 +51,9 @@ const AddFeeChargeForm = ({
    const onSubmit = (data: TAddFeeChargePayload) => {
       console.log('data', data)
       addFeeChargeAsync(data)
+
+      form.reset()
+      setIsDialogOpen(false)
    }
 
    useEffect(() => {
@@ -75,7 +78,6 @@ const AddFeeChargeForm = ({
             }
          }}
       >
-         <LoadingOverlay isLoading={false} fullScreen={true} />
          <DialogTrigger>{children}</DialogTrigger>
          <DialogContent className="!w-[700px] !max-w-[700px]">
             <div>

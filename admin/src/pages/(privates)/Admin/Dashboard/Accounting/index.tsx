@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import RenterTable from './_components/RenterTable'
 import FeeChargeTable from './_components/FeeChargeTable'
 import { AccountingProvider } from './_provider'
+import AddRenterForm from './_components/AddRenterForm'
 
 const AccountingPage = () => {
    return (
@@ -79,15 +80,12 @@ const AccountingPage = () => {
                         Renter list
                      </Button>
                   </RenterTable>
+                  <AddRenterForm>
+                     <Button className="bg-[#6938DA] text-white text-[15px] rounded-full h-[40px] w-[150px] hover:bg-[#8956FF] cursor-pointer font-semibold">
+                        Create Renter
+                     </Button>
+                  </AddRenterForm>
                   {/* <RenterForm>
-                  <Button
-                     className="bg-[#6938DA] text-white text-[15px] rounded-full h-[40px] w-[150px] hover:bg-[#8956FF] cursor-pointer font-semibold"
-                     onClick={async () => {
-                        // initializeRenter(new PublicKey('EQeNhVUmS75zr5QetxKwWWLNmdU5Npa7fZ1XzbLX2DQY'), 'Foo Bar')
-                     }}
-                  >
-                     Create Renter
-                  </Button>
                </RenterForm> */}
                </div>
             </div>

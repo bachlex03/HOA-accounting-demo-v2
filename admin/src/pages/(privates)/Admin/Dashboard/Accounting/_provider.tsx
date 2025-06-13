@@ -11,6 +11,9 @@ import {
 } from 'react'
 import z from 'zod'
 import * as anchor from '@coral-xyz/anchor'
+import useTransactionToast from '@/hooks/useTransactionToast'
+import { useLoadingOverlay } from '@/components/providers/LoadingOverlayProvider'
+import type { TAddRenterPayload } from '@/domain/schemas/renter.schema'
 
 const FeeTypeSchema = z.enum(['monthly', 'special', 'unknown'])
 const FeeStatusSchema = z.enum(['paid', 'unpaid', 'overdue', 'unknown'])
@@ -48,6 +51,7 @@ type AccountingContext = {
    renterAccount: {
       renters: TRenterAccount[]
       isFetching: boolean
+      addRenterAsync: (payload: TAddRenterPayload) => Promise<void>
       refetch?: () => void
    }
    feeChargeAccount: {
@@ -55,8 +59,8 @@ type AccountingContext = {
       unpaidFees: TFeeChargeAccount[]
       overDueFees: TFeeChargeAccount[]
       isFetching: boolean
-      refetch?: () => void
       addFeeChargeAsync: (payload: TAddFeeChargePayload) => Promise<void>
+      refetch?: () => void
    }
 }
 
@@ -65,7 +69,12 @@ const AccountingContext = createContext<AccountingContext | null>(null)
 export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
    children,
 }) => {
+   const [transactionSignature, setTransactionSignature] = useState<
+      string | null
+   >(null)
+
    const { program, connection, publicKey } = useProgram()
+   const { isLoading, showLoading, hideLoading } = useLoadingOverlay()
 
    const [renterAccount, setRenterAccount] = useState<{
       renters: TRenterAccount[]
@@ -87,11 +96,14 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
       isFetching: false,
    })
 
+   useTransactionToast({ transactionSignature })
+
    //  RenterAccount
    const fetchRentersAsync = useCallback(async () => {
       if (!connection || !program || !publicKey) return
 
       try {
+         showLoading()
          setRenterAccount((prev) => ({ ...prev, isFetching: true }))
 
          const renters = await program.account.renterAccount.all([])
@@ -115,15 +127,70 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
       } finally {
          setTimeout(() => {
             setRenterAccount((prev) => ({ ...prev, isFetching: false }))
+            hideLoading()
          }, 500)
       }
    }, [connection])
 
-   useEffect(() => {
-      if (connection) {
-         fetchRentersAsync()
+   const addRenterAsync = async (payload: TAddRenterPayload) => {
+      if (program && publicKey) {
+         try {
+            showLoading()
+            setRenterAccount((prev) => ({ ...prev, isFetching: true }))
+
+            const renterSeeds = [
+               Buffer.from('RENTER_STATE'),
+               publicKey.toBuffer(),
+            ]
+            const [renterPda] = PublicKey.findProgramAddressSync(
+               renterSeeds,
+               program.programId,
+            )
+            const params = {
+               renter: renterPda,
+               owner: payload.public_key,
+               authority: publicKey,
+            }
+            const txSignature = await program.methods
+               .initializeRenter(payload.renter_name)
+               .accounts({
+                  ...params,
+               })
+               .rpc()
+
+            setTransactionSignature(txSignature)
+
+            await fetchFeesAsync()
+
+            const modifiedData = {
+               ...payload,
+               secret_key: JSON.stringify(payload.secret_key), // Convert array to string like "[152,125,...]"
+            }
+
+            // Save as downloadable file
+            const dataStr = JSON.stringify(modifiedData, null, 2)
+            const dataBlob = new Blob([dataStr], {
+               type: 'application/json',
+            })
+            const url = URL.createObjectURL(dataBlob)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = `wallet-${payload.public_key.toBase58()}-${payload.renter_name}.json`
+            link.style.display = 'none'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(url)
+         } catch (error) {
+            console.error('[LOG:ERROR]::', error)
+         } finally {
+            setTimeout(() => {
+               setRenterAccount((prev) => ({ ...prev, isFetching: false }))
+               hideLoading()
+            }, 500)
+         }
       }
-   }, [connection])
+   }
 
    //  FeeChargeAccount
    const fetchFeesAsync = useCallback(async () => {
@@ -174,8 +241,14 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
          )
 
          console.log(
-            'sortedFees.data.toRenter',
-            sortedFees.map((fee) => fee.data.toRenter.toBase58()),
+            'sortedFees',
+            sortedFees.map((fee) => {
+               return {
+                  feePubkey: fee.publicKey.toBase58(),
+                  feeAmount: fee.data.feeAmount,
+                  renterPubkey: fee.data.toRenter.toBase58(),
+               }
+            }),
          )
 
          setFeeChargeAccount((prev) => ({
@@ -197,16 +270,17 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
    const addFeeChargeAsync = async (payload: TAddFeeChargePayload) => {
       if (program && publicKey) {
          try {
+            showLoading()
             setFeeChargeAccount((prev) => ({ ...prev, isFetching: true }))
 
             const timeStamp = payload.due_date.getTime() / 1000
-            console.log('timeStamp', timeStamp)
+            // console.log('timeStamp', timeStamp)
             const amount = new anchor.BN(payload.amount)
-            console.log('amount', amount)
+            // console.log('amount', amount)
             const dueDate = new anchor.BN(timeStamp) // Convert to seconds since epoch
-            console.log('dueDate', dueDate)
+            // console.log('dueDate', dueDate)
             const nextFeeId = new anchor.BN(payload.next_fee_id) // Assuming this is the first fee being added
-            console.log('nextFeeId', nextFeeId)
+            // console.log('nextFeeId', nextFeeId)
 
             const renterAccountSeeds = [
                Buffer.from('RENTER_STATE'),
@@ -228,10 +302,10 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
                feeChargeSeeds,
                program.programId,
             )
-            console.log(
-               '[LOG:VAR]::feeChargeAccountPDA: ',
-               feeChargeAccountPDA.toBase58(),
-            )
+            // console.log(
+            //    '[LOG:VAR]::feeChargeAccountPDA: ',
+            //    feeChargeAccountPDA.toBase58(),
+            // )
 
             const params = {
                feeChargeAccount: feeChargeAccountPDA,
@@ -239,27 +313,29 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
                fromAuthority: publicKey,
             }
 
-            const tx = await program.methods
+            const txSignature = await program.methods
                .addFeeCharge(payload.fee_type, amount, dueDate)
                .accounts(params)
                .rpc()
 
-            console.log('[LOG:VAR]:tx::', tx)
+            // console.log('[LOG:VAR]:txSignature::', txSignature)
 
-            const feeChargeAccount =
-               await program.account.feeChargeAccount.fetch(feeChargeAccountPDA)
-            console.log(
-               '[LOG:VAR]::feeChargeAccount.feeType: ',
-               feeChargeAccount.feeType,
-            )
-            console.log(
-               '[LOG:VAR]::feeChargeAccount.amount: ',
-               feeChargeAccount.amount.toNumber(),
-            )
-            console.log(
-               '[LOG:VAR]::feeChargeAccount.dueDate: ',
-               feeChargeAccount.dueDate.toNumber(),
-            )
+            // const feeChargeAccount =
+            //    await program.account.feeChargeAccount.fetch(feeChargeAccountPDA)
+            // console.log(
+            //    '[LOG:VAR]::feeChargeAccount.feeType: ',
+            //    feeChargeAccount.feeType,
+            // )
+            // console.log(
+            //    '[LOG:VAR]::feeChargeAccount.amount: ',
+            //    feeChargeAccount.amount.toNumber(),
+            // )
+            // console.log(
+            //    '[LOG:VAR]::feeChargeAccount.dueDate: ',
+            //    feeChargeAccount.dueDate.toNumber(),
+            // )
+
+            setTransactionSignature(txSignature)
 
             await fetchFeesAsync()
          } catch (err) {
@@ -267,6 +343,7 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
          } finally {
             setTimeout(() => {
                setFeeChargeAccount((prev) => ({ ...prev, isFetching: false }))
+               hideLoading()
             }, 500)
          }
       }
@@ -274,6 +351,7 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
 
    useEffect(() => {
       if (connection) {
+         fetchRentersAsync()
          fetchFeesAsync()
       }
    }, [connection])
@@ -294,6 +372,7 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
          renterAccount: {
             renters: renterAccount.renters,
             isFetching: renterAccount.isFetching,
+            addRenterAsync: addRenterAsync,
          },
          feeChargeAccount: {
             fees: feeChargeAccount.fees,

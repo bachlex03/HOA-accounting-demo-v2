@@ -25,8 +25,10 @@ import {
    TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
+import CopyablePublicKey from '@/components/ui/copyable-public-key'
 
 type TRenterFeeTable = {
+   feeTx: string
    feeId: number
    ownerName: string
    paymentType: TFeeType
@@ -57,6 +59,7 @@ const RenterFeeTable = ({
                   selectedFee.ownerPubkey?.toBase58(),
             )
             .map((fee: TFeeChargeAccount) => ({
+               feeTx: fee.publicKey.toBase58(),
                feeId: fee.data.feeId,
                ownerName: selectedFee.ownerName,
                paymentType: fee.data.feeType,
@@ -89,6 +92,9 @@ const RenterFeeTable = ({
                   <TableHeader>
                      <TableRow className="bg-[#F3EEFF] dark:bg-slate-800/50 dark:hover:bg-slate-800/50">
                         <TableHead className="font-medium w-[15%] border">
+                           TX
+                        </TableHead>
+                        <TableHead className="font-medium w-[15%] border">
                            Month
                         </TableHead>
                         <TableHead className="font-medium w-[15%] border">
@@ -103,6 +109,14 @@ const RenterFeeTable = ({
                      {renterFees.map((fee: TRenterFeeTable, index) => {
                         return (
                            <TableRow key={index}>
+                              <TableCell className="transition-all text-sm font-light hover:bg-slate-50 dark:hover:bg-slate-800/50 animate-fadeIn border border-slate-200 dark:border-slate-700">
+                                 <CopyablePublicKey
+                                    publicKey={fee.feeTx}
+                                    startChars={4}
+                                    endChars={4}
+                                 />
+                              </TableCell>
+
                               <TableCell className="transition-all text-sm font-light hover:bg-slate-50 dark:hover:bg-slate-800/50 animate-fadeIn border border-slate-200 dark:border-slate-700">
                                  {fee.dueDate.toLocaleDateString('en-US', {
                                     month: 'short',

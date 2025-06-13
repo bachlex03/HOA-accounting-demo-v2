@@ -1,8 +1,16 @@
+import { LoadingOverlay } from '@/components/customs/LoadingOverlay'
+import {
+   LoadingOverlayProvider,
+   useLoadingOverlay,
+} from '@/components/providers/LoadingOverlayProvider'
 import { Toaster } from 'sonner'
 
-const GlobalLayout = ({ children }: { children: React.ReactNode }) => {
+const GlobalLayoutContent = ({ children }: { children: React.ReactNode }) => {
+   const { isLoading } = useLoadingOverlay()
+
    return (
       <div className="global-layout">
+         <LoadingOverlay isLoading={isLoading} fullScreen />
          {children}
          <Toaster
             position="bottom-right"
@@ -22,6 +30,14 @@ const GlobalLayout = ({ children }: { children: React.ReactNode }) => {
             }}
          />
       </div>
+   )
+}
+
+const GlobalLayout = ({ children }: { children: React.ReactNode }) => {
+   return (
+      <LoadingOverlayProvider>
+         <GlobalLayoutContent>{children}</GlobalLayoutContent>
+      </LoadingOverlayProvider>
    )
 }
 
