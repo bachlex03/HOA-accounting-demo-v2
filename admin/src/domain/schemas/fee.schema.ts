@@ -9,13 +9,14 @@ const addFeeChargeSchema = z.object({
          (value: string) => {
             try {
                const publicKey = new PublicKey(value)
-               return PublicKey.isOnCurve(publicKey)
+
+               return true
             } catch {
                return false
             }
          },
          {
-            message: 'Public key must be a valid Solana PublicKey string',
+            message: 'Public key must be a valid PDA PublicKey',
          },
       )
       .transform((value) => new PublicKey(value)),
@@ -30,16 +31,20 @@ const addFeeChargeSchema = z.object({
       .refine((date) => date > new Date(), {
          message: 'Event valid from date must be in the future',
       }),
-   fee_type: z.string().min(1, {
-      message: 'Fee type is required',
-   }),
+   fee_type: z
+      .string({
+         required_error: 'Fee type is required',
+      })
+      .min(1, {
+         message: 'Fee type is required',
+      }),
    amount: z
       .number({
          required_error: 'Enter an amount',
          invalid_type_error: 'Enter an amount',
       })
-      .min(0, {
-         message: 'Amount must be a positive number',
+      .min(1, {
+         message: 'Amount is required',
       }),
 } satisfies Record<keyof IAddFeeChargePayload, z.ZodTypeAny>)
 

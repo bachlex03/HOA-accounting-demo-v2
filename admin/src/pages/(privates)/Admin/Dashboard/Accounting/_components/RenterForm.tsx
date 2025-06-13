@@ -14,17 +14,16 @@ import {
    type TAddRenterPayload,
 } from '@/domain/schemas/renter.schema'
 import InputField from '@/components/fields/InputField'
-import useRenter from '@/hooks/use-renter'
 import { HiOutlinePlusSmall } from 'react-icons/hi2'
 import * as bs58 from 'bs58'
 import * as bip39 from 'bip39'
 import { useEffect } from 'react'
 import { Keypair } from '@solana/web3.js'
 import { HDKey } from 'micro-ed25519-hdkey'
-import { LoadingOverlay } from '@/components/LoadingOverlay'
+import { LoadingOverlay } from '@/components/customs/LoadingOverlay'
 
 const RenterForm = ({ children }: { children?: React.ReactNode }) => {
-   const { initializeRenter, isLoading, refetch } = useRenter()
+   //  const { initializeRenter, isLoading, refetch } = useRenter()
 
    const form = useForm<TAddRenterPayload>({
       resolver: addRenterResolver,
@@ -75,7 +74,7 @@ const RenterForm = ({ children }: { children?: React.ReactNode }) => {
    const onSubmit = async (data: TAddRenterPayload) => {
       console.log('Form submitted with data:', data)
 
-      await initializeRenter(data)
+      // await initializeRenter(data)
 
       // refetch()
       form.reset()
@@ -87,7 +86,7 @@ const RenterForm = ({ children }: { children?: React.ReactNode }) => {
    }, [])
    return (
       <Dialog>
-         <LoadingOverlay isLoading={isLoading} fullScreen />
+         <LoadingOverlay isLoading={false} fullScreen />
          <DialogTrigger>{children}</DialogTrigger>
 
          <DialogContent className="!w-[600px] !max-w-[600px]">

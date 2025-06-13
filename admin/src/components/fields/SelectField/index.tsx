@@ -21,7 +21,7 @@ import {
    type ArrayPath,
 } from 'react-hook-form'
 
-export type OptionType = {
+export type TOption = {
    value: string
    label: string
    icon?: React.ComponentType<{ className?: string }>
@@ -31,7 +31,7 @@ type SelectFieldProps<T extends FieldValues> = {
    form: UseFormReturn<T>
    name: Path<T> | ArrayPath<T>
    label: string
-   optionsData: OptionType[]
+   optionsData: TOption[]
    description?: string
    className?: string
    placeholder?: string

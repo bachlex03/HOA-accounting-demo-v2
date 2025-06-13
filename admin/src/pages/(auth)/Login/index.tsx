@@ -1,5 +1,5 @@
+import { WalletConnectionButton } from '@/components/customs/WalletConnectionBtn'
 import { Building2 } from 'lucide-react'
-import { WalletConnectionButton } from '@/components/ConnectionWalletBtn'
 
 const LoginPage = () => {
    return (

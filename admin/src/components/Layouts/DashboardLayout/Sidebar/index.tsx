@@ -4,7 +4,6 @@ import {
    SidebarFooter,
    SidebarHeader,
    SidebarMenu,
-   SidebarMenuButton,
    SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import {
@@ -26,12 +25,7 @@ import { HiOutlineHome, HiOutlineClipboardDocumentList } from 'react-icons/hi2'
 
 import NavItems from './NavItems'
 import { NavUser } from '@/components/layouts/DashboardLayout/_components/nav-user'
-
-import {
-   WalletDisconnectButton,
-   WalletMultiButton,
-} from '@solana/wallet-adapter-react-ui'
-import { WalletConnectionButton } from '@/components/ConnectionWalletBtn'
+import { WalletConnectionButton } from '@/components/customs/WalletConnectionBtn'
 
 // This is sample data.
 const data = {
