@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 /* eslint-disable react-refresh/only-export-components */
 import useProgram from '@/hooks/useProgram'
 import { PublicKey } from '@solana/web3.js'
