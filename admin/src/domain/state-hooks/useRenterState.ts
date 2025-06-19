@@ -2,8 +2,6 @@ import useProgram from '@/hooks/useProgram'
 import { useCallback, useEffect, useState } from 'react'
 import { PublicKey } from '@solana/web3.js'
 
-let initialized = false
-
 export type TRenterAccount = {
    publicKey: PublicKey
    data: {

@@ -74,7 +74,7 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
    >(null)
 
    const { program, connection, publicKey } = useProgram()
-   const { isLoading, showLoading, hideLoading } = useLoadingOverlay()
+   const { showLoading, hideLoading } = useLoadingOverlay()
 
    const [renterAccount, setRenterAccount] = useState<{
       renters: TRenterAccount[]

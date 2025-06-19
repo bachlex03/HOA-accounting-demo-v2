@@ -14,7 +14,6 @@ import {
 
 import { NavMain } from '@/components/layouts/DashboardLayout/_components/nav-main'
 import { NavProjects } from '@/components/layouts/DashboardLayout/_components/nav-projects'
-import { NavUser } from '@/components/layouts/DashboardLayout/_components/nav-user'
 import { TeamSwitcher } from '@/components/layouts/DashboardLayout/_components/team-switcher'
 import {
    Sidebar,

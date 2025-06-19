@@ -8,8 +8,7 @@ const addFeeChargeSchema = z.object({
       .custom<PublicKey>(
          (value: string) => {
             try {
-               const publicKey = new PublicKey(value)
-
+               new PublicKey(value)
                return true
             } catch {
                return false

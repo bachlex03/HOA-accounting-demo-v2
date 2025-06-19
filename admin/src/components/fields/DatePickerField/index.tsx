@@ -32,8 +32,6 @@ const DatePickerField = <T extends FieldValues>({
    name,
    label,
    description,
-   className,
-   disabled,
 }: DatePickerFieldProps<T>) => {
    return (
       <FormField
