@@ -14,6 +14,7 @@ import * as anchor from '@coral-xyz/anchor'
 import useTransactionToast from '@/hooks/useTransactionToast'
 import { useLoadingOverlay } from '@/components/providers/LoadingOverlayProvider'
 import type { TAddRenterPayload } from '@/domain/schemas/renter.schema'
+import { toast } from 'sonner'
 
 const FeeTypeSchema = z.enum(['monthly', 'special', 'unknown'])
 const FeeStatusSchema = z.enum(['paid', 'unpaid', 'overdue', 'unknown'])
@@ -123,7 +124,17 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
 
          setRenterAccount((prev) => ({ ...prev, renters: mappedRenters }))
       } catch (err) {
-         console.error('Error fetching:', err)
+         console.error('Fetching Renters Failed:', err)
+
+         toast.error('Fetching Renters Failed', {
+            description: `${err}`,
+            style: {
+               border: '1px solid rgba(239, 68, 68, 0.3)',
+               background:
+                  'linear-gradient(to right, rgba(40, 27, 27, 0.95), rgba(28, 23, 23, 0.95))',
+            },
+            duration: 5000,
+         })
       } finally {
          setTimeout(() => {
             setRenterAccount((prev) => ({ ...prev, isFetching: false }))
@@ -181,8 +192,18 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
             link.click()
             document.body.removeChild(link)
             URL.revokeObjectURL(url)
-         } catch (error) {
-            console.error('[LOG:ERROR]::', error)
+         } catch (err) {
+            console.error('[LOG:ERROR]::', err)
+
+            toast.error('Add renter failed', {
+               description: `${err}`,
+               style: {
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  background:
+                     'linear-gradient(to right, rgba(40, 27, 27, 0.95), rgba(28, 23, 23, 0.95))',
+               },
+               duration: 5000,
+            })
          } finally {
             setTimeout(() => {
                setRenterAccount((prev) => ({ ...prev, isFetching: false }))
@@ -257,6 +278,16 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
          }))
       } catch (err) {
          console.error('Error fetching:', err)
+
+         toast.error('Fetching Fees Failed', {
+            description: `${err}`,
+            style: {
+               border: '1px solid rgba(239, 68, 68, 0.3)',
+               background:
+                  'linear-gradient(to right, rgba(40, 27, 27, 0.95), rgba(28, 23, 23, 0.95))',
+            },
+            duration: 5000,
+         })
       } finally {
          setTimeout(() => {
             setFeeChargeAccount((prev) => ({
@@ -340,6 +371,16 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({
             await fetchFeesAsync()
          } catch (err) {
             console.error('Error adding fee charge:', err)
+
+            toast.error('Error adding fee charge', {
+               description: `${err}`,
+               style: {
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  background:
+                     'linear-gradient(to right, rgba(40, 27, 27, 0.95), rgba(28, 23, 23, 0.95))',
+               },
+               duration: 5000,
+            })
          } finally {
             setTimeout(() => {
                setFeeChargeAccount((prev) => ({ ...prev, isFetching: false }))
